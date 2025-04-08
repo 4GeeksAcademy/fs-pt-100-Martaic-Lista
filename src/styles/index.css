@@ -1,11 +1,41 @@
-/* 
+.task-input {
+    width: 80%;
+    padding: 12px;
+    border-radius: 5px;
+    border: 2px solid #ccc;
+    font-size: 18px;
+    text-align: center;
+}
+.add-button{
+    width: 10%;
+    padding: 12px;
+    border-radius: 5px;
+    border: 2px solid #ccc;
+}
 
-    You can write your own styles here...
-    
-    
-    ...Or you can use the import command to include 
-    other sylesheets into your bunde as well, e.j:
-    
-    import 'relative/path/to/stylesheet.scss';
+.task-item {
+    position: relative;
+    padding: 10px;
+    margin: 5px 0;
+    background-color: #fff9c4;
+    border-radius: 5px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    text-align: center;
+}
 
-*/
+.delete-button {
+    cursor: pointer;
+    color: red;
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    display: none;
+}
+.task-list {
+    list-style: none;
+    padding: 0;
+}
+.task-item:hover .delete-button {
+    display: inline;
+}
