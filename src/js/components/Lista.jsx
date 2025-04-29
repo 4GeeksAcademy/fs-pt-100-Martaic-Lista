@@ -4,16 +4,26 @@ export const Lista = () => {
     const [data, setData] = useState([]);
     const [task, setTask] = useState("");
 
-    useEffect(() => {
-        fetch("https://playground.4geeks.com/todo/users/minigoca",
-            {
-                method: "POST",
-                headers: { "Content-Type": "application/json" }
-            })
-            .then(() => fetch("https://playground.4geeks.com/todo/users/minigoca"))
+    const getTasks = () => {
+        fetch("https://playground.4geeks.com/todo/users/minigoca")
             .then(response => response.json())
             .then(tasks => setData(tasks.todos))
             .catch(error => console.error("Error al obtener tareas", error));
+    };
+
+    useEffect(() => {
+        fetch("https://playground.4geeks.com/todo/users/minigoca", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" }
+        })
+            .then(response => {
+                if (response.ok || response.status === 400) {
+                    getTasks();
+                } else {
+                    throw new Error("Error creando el usuario");
+                }
+            })
+            .catch(error => console.error("Error al crear el usuario o cargar tareas", error));
     }, []);
 
     const addTask = (e) => {
@@ -22,29 +32,31 @@ export const Lista = () => {
 
         fetch("https://playground.4geeks.com/todo/todos/minigoca", {
             method: "POST",
-            body: JSON.stringify({ label: task, done: false }),
+            body: JSON.stringify({ label: task, is_done: false }),
             headers: { "Content-Type": "application/json" }
         })
-            .then(() => fetch("https://playground.4geeks.com/todo/users/minigoca"))
-            .then(response => response.json())
-            .then(tasks => setData(tasks.todos))
-            .catch(error => console.error("Error al agregar tarea", error));
+            .then(response => {
+                if (!response.ok) throw new Error("Error al agregar tarea");
+                return response.json();
+            })
+            .then(() => getTasks())
+            .catch(error => console.error("Error al agregar tarea:", error));
 
         setTask("");
     };
 
     const deleteTask = (taskId) => {
-        fetch(`https://playground.4geeks.com/todo/todos/${taskId}`,
-            { method: "DELETE" })
-            .then(() => fetch("https://playground.4geeks.com/todo/users/minigoca"))
-            .then(response => response.json())
-            .then(tasks => setData(tasks.todos))
+        fetch(`https://playground.4geeks.com/todo/todos/${taskId}`, {
+            method: "DELETE"
+        })
+            .then(() => getTasks())
             .catch(error => console.error("Error al eliminar tarea", error));
     };
 
     const clearAllTasks = () => {
-        fetch("https://playground.4geeks.com/todo/users/minigoca",
-            { method: "DELETE" })
+        fetch("https://playground.4geeks.com/todo/users/minigoca", {
+            method: "DELETE"
+        })
             .then(() => setData([]))
             .catch(error => console.error("Error al eliminar todas las tareas", error));
     };
@@ -82,4 +94,3 @@ export const Lista = () => {
         </div>
     );
 };
-
