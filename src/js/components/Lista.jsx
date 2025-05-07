@@ -6,24 +6,22 @@ export const Lista = () => {
 
     const getTasks = () => {
         fetch("https://playground.4geeks.com/todo/users/minigoca")
-            .then(response => response.json())
-            .then(tasks => setData(tasks.todos))
-            .catch(error => console.error("Error al obtener tareas", error));
-    };
-
-    useEffect(() => {
-        fetch("https://playground.4geeks.com/todo/users/minigoca", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" }
-        })
             .then(response => {
-                if (response.ok || response.status === 400) {
-                    getTasks();
+                if (response.status === 404) {
+                    return fetch("https://playground.4geeks.com/todo/users/minigoca", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" }
+                    }).then(() => getTasks());
                 } else {
-                    throw new Error("Error creando el usuario");
+                    return response.json().then(tasks => setData(tasks.todos));
                 }
             })
-            .catch(error => console.error("Error al crear el usuario o cargar tareas", error));
+            .catch(error => console.error("Error al obtener o crear usuario", error));
+    };
+    
+
+    useEffect(() => {
+        getTasks();
     }, []);
 
     const addTask = (e) => {
@@ -57,9 +55,16 @@ export const Lista = () => {
         fetch("https://playground.4geeks.com/todo/users/minigoca", {
             method: "DELETE"
         })
-            .then(() => setData([]))
-            .catch(error => console.error("Error al eliminar todas las tareas", error));
+            .then(() =>
+                fetch("https://playground.4geeks.com/todo/users/minigoca", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" }
+                })
+            )
+            .then(() => getTasks())
+            .catch(error => console.error("Error al eliminar o recrear el usuario", error));
     };
+    
 
     return (
         <div className="lista-container">
